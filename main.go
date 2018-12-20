@@ -7,12 +7,8 @@ import (
 	"os"
 )
 
-var (
-	i int
-)
-
 func uiMain() {
-	win := ui.NewWindow("Lufus", 300, 450, true)
+	win := ui.NewWindow("Lufus v0.1.0", 0, 0, true)
 	defer win.Show()
 
 	vbox := ui.NewVerticalBox()
@@ -58,17 +54,99 @@ func uiMain() {
 	vbox.Append(volumeLabel, false)
 
 	// Format options group
-	fOptions := ui.NewGroup("Format options")
-	vbox.Append(fOptions, false)
-	{
-		fvBox := ui.NewVerticalBox()
-		fvBox.SetPadded(true)
-		// Check device for bad blocks
-		badBlocksCheck := ui.NewCheckbox("Check device for bad blocks")
-		fvBox.Append(badBlocksCheck, false)
+	formatOptions := ui.NewGroup("Format options")
+	vbox.Append(formatOptions, false)
 
-		fOptions.SetChild(fvBox)
-	}
+	// File options vBox
+	fvBox := ui.NewVerticalBox()
+	fvBox.SetPadded(true)
+
+	// Check device for bad blocks
+	badBlocksCheckbox := ui.NewCheckbox("Check device for bad blocks")
+	fvBox.Append(badBlocksCheckbox, false)
+
+	// Quick format
+	quickFormatCheckbox := ui.NewCheckbox("Quick format")
+	quickFormatCheckbox.SetChecked(true)
+	fvBox.Append(quickFormatCheckbox, false)
+
+	// Create a bootable disk ...
+	createBootableDiskByHBox := ui.NewHorizontalBox()
+
+	// Create disk checkbox
+	createDiskCheckbox := ui.NewCheckbox("Create a bootable disk using")
+	createDiskCheckbox.SetChecked(true)
+	createBootableDiskByHBox.Append(createDiskCheckbox, false)
+
+	// By .. combo box
+	isoOrDosComboBox := ui.NewCombobox()
+	isoOrDosComboBox.Append("ISO image")
+	isoOrDosComboBox.Append("FreeDOS")
+	isoOrDosComboBox.SetSelected(0)
+	createBootableDiskByHBox.Append(isoOrDosComboBox, false)
+
+	// Select iso image button
+	selectIsoButton := ui.NewButton("Select")
+	createBootableDiskByHBox.Append(selectIsoButton, false)
+	// Add this hbox into format group vbox
+	fvBox.Append(createBootableDiskByHBox, false)
+
+	// Create extended labels ... checkbox
+	createExtendedLabelsCheckbox := ui.NewCheckbox("Create extended labels and icon files")
+	createExtendedLabelsCheckbox.SetChecked(true)
+	fvBox.Append(createExtendedLabelsCheckbox, false)
+
+	// Set format options vBox as child of format box
+	formatOptions.SetChild(fvBox)
+
+	// Main progress bar - writing files to drive etc.
+	mainProgressBar := ui.NewProgressBar()
+	mainProgressBar.SetValue(100)
+	vbox.Append(mainProgressBar, false)
+
+	// Actual status
+	statusLabel := ui.NewLabel("READY")
+	vbox.Append(statusLabel, false)
+
+	// Bottom button bar
+	bottomButtonBar := ui.NewHorizontalBox()
+	bottomButtonBar.SetPadded(true)
+
+	aboutButton := ui.NewButton("About..")
+	bottomButtonBar.Append(aboutButton, false)
+
+	logButton := ui.NewButton("Log")
+	bottomButtonBar.Append(logButton, false)
+
+	// Empty label as spacer
+	bottomButtonBar.Append(ui.NewLabel(""), true)
+
+	startButton := ui.NewButton("Start")
+	bottomButtonBar.Append(startButton, false)
+
+	closeButton := ui.NewButton("Close")
+	bottomButtonBar.Append(closeButton, false)
+
+	vbox.Append(bottomButtonBar, false)
+
+	vbox.Append(ui.NewHorizontalSeparator(), false)
+
+	// Time and devices count bar
+	bottomStatusBar := ui.NewHorizontalBox()
+	bottomStatusBar.SetPadded(true)
+
+	devicesCount := ui.NewLabel("1 device found")
+	bottomStatusBar.Append(devicesCount, false)
+
+	// Empty label as spacer
+	bottomStatusBar.Append(ui.NewLabel(""), true)
+
+	bottomStatusBar.Append(ui.NewVerticalSeparator(), false)
+	timer := ui.NewLabel("00:00:00")
+	bottomStatusBar.Append(timer, false)
+
+	vbox.Append(bottomStatusBar, false)
+
 	win.SetChild(vbox)
 	win.OnClosing(func(window *ui.Window) bool {
 		os.Exit(1)
