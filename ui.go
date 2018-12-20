@@ -123,6 +123,9 @@ func createUI() {
 	bottomButtonBar.Append(startButton, false)
 
 	closeButton := ui.NewButton("Close")
+	closeButton.OnClicked(func(button *ui.Button) {
+		exitApp()
+	})
 	bottomButtonBar.Append(closeButton, false)
 
 	vbox.Append(bottomButtonBar, false)
@@ -147,9 +150,12 @@ func createUI() {
 
 	win.SetChild(vbox)
 	win.OnClosing(func(window *ui.Window) bool {
-		os.Exit(1)
+		exitApp()
 		return true
 	})
 	win.SetMargined(true)
+}
 
+func exitApp() {
+	os.Exit(1)
 }
